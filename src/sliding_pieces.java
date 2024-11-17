@@ -5,19 +5,6 @@ import java.util.ArrayList;
 
 
 public class sliding_pieces {
-
-    boolean whiteKingMoved = false;
-    boolean whiteRookLeftMoved = false;
-    boolean whiteRookRightMoved = false;
-    boolean blackKingMoved = false;
-    boolean blackRookLeftMoved = false;
-    boolean blackRookRightMoved = false;
-
-
-    int enPassantSquare = -1;  // The square where En Passant is available
-    boolean enPassantColor = false;  // Which color's turn it is for En Passant
-
-
     int[] directionOffset = {8,-8,-1,1,7,-7,9,-9};
 int[][] numToEndge = new int[64][];
 

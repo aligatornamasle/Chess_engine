@@ -115,8 +115,7 @@ if(move!=null)
         return false;
     }
     public boolean makeMove(int movee,boolean color,Move move) {
-       // var move = new Move(selcoor, movee, selectedPiece, 0);
-       // move.piece = selectedPiece;
+
         var moves = sliding_pieces.generateMoves(color, testGrid, previosMove, isCastling);
 
 

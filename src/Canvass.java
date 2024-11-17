@@ -44,10 +44,10 @@ public static class ChessBoard extends JPanel implements MouseListener, MouseMot
         /// endgame -
         this.grid = grid;
         run = new Run();
-
+//run.setupBoardFromFEN("8/8/5p2/1P1K1k2/8/2r5/8/7R w - - 0 0");
 //run.setupBoardFromFEN("8/8/8/8/2k5/3q4/8/K7 w - - 0 1");
        // run.setupBoardFromFEN("r3k2r/3p4/8/8/8/8/7P/R3K2R w KQkq - 0 1");
-        run.setupBoardFromFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+       run.setupBoardFromFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 //run.setupBoardFromFEN("4k3/6p1/8/8/8/PP6/KPp3N1/NP6 w HAha - 0 1");
         setPreferredSize(new Dimension(size,size));
         addMouseListener(this);

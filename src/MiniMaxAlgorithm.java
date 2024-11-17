@@ -140,7 +140,7 @@ public class MiniMaxAlgorithm {
         // Base case: if we reach the maximum depth, evaluate the board
         if (maxDepth == 0) {
             test++;
-            return new MoveScore(evaluations.evaluateBoard(currentGrid, maximizingPlayer, movesPlayed), latestMove);
+            return new MoveScore(evaluations.evaluateBoard(currentGrid, maximizingPlayer, movesPlayed,latestMove), latestMove);
         }
 
         // Generate all possible moves for the current player
@@ -162,7 +162,7 @@ public class MiniMaxAlgorithm {
             Move mv = new Move(move.start,move.target,move.piece,move.promotion);
             Integer[] nextGrid = game.copyGridWithMove(Arrays.copyOf(currentGrid,currentGrid.length),mv,maximizingPlayer,latestMove,Arrays.copyOf(castling,castling.length));
 
-            double moveScore = evaluations.evaluateBoard(nextGrid, maximizingPlayer,movesPlayed);
+            double moveScore = evaluations.evaluateBoard(nextGrid, maximizingPlayer,movesPlayed,move);
             prioritizedMoves.add(new PieceMovePair(move.start,move.target,move,moveScore,move.promotion));
 
         }
