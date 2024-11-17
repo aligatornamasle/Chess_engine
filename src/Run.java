@@ -15,6 +15,7 @@ boolean[] isCastling = new boolean[6];
     int counter = 0;
     int counter2 = 0;
     ArrayList<Move> movesss= new ArrayList<>();
+    boolean gameflow = true;
 
     public Run() {
 //setupBoardFromFEN("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ");
@@ -129,7 +130,9 @@ if(move!=null)
                 }
             }
         }
-        System.out.println("A");
+        if(moves.size() == 0){
+            gameflow = false;
+        }
 
 
 if(canMove){
@@ -611,6 +614,12 @@ if(grid[15]==6&& grid[4] == 1){
 
 
         return testGrid;
+    }
+
+
+    boolean isChecked(Integer[] grid, boolean color,Move previosMove){
+        //sliding_pieces.isValidMove(grid,target,piece,start,color,previosMove);
+       return sliding_pieces.isChecked(grid,color,previosMove);
     }
 
 }

@@ -145,10 +145,31 @@ public class MiniMaxAlgorithm {
 
         // Generate all possible moves for the current player
         var possibleMoves = game.getPossibleMoves(maximizingPlayer, currentGrid, latestMove, castling);
+        List<PieceMovePair> prioritizedMoves = new ArrayList<>();
         if (possibleMoves.size() == 0) {
             // If no moves are possible, return a very low or high score depending on the player
-            double score = maximizingPlayer ? -10000 - maxDepth : 10000 - maxDepth;
+            double score;
+            if(game.isChecked(currentGrid,maximizingPlayer,latestMove)){
+            score = maximizingPlayer ? -10000 - maxDepth : 10000 - maxDepth;
+            } else{
+                score = 0;
+            }
             return new MoveScore(score, null);
+        }
+        for (Move move : possibleMoves) {
+
+            sorting++;
+            Move mv = new Move(move.start,move.target,move.piece,move.promotion);
+            Integer[] nextGrid = game.copyGridWithMove(Arrays.copyOf(currentGrid,currentGrid.length),mv,maximizingPlayer,latestMove,Arrays.copyOf(castling,castling.length));
+
+            double moveScore = evaluations.evaluateBoard(nextGrid, maximizingPlayer,movesPlayed);
+            prioritizedMoves.add(new PieceMovePair(move.start,move.target,move,moveScore,move.promotion));
+
+        }
+        if (maximizingPlayer) {
+            prioritizedMoves.sort((a, b) -> Double.compare(b.score, a.score)); // Higher scores first
+        } else {
+            prioritizedMoves.sort((a, b) -> Double.compare(a.score, b.score)); // Lower scores first
         }
 
         // Variable to track the best move and its score
@@ -157,17 +178,18 @@ public class MiniMaxAlgorithm {
         if (maximizingPlayer) {
             double maxEval = Double.NEGATIVE_INFINITY;
 
-            for (Move move : possibleMoves) {
+            for (PieceMovePair move : prioritizedMoves) {
                 // Apply the move to create the next grid state
-                Integer[] nextGrid = game.copyGridWithMove(currentGrid, move, maximizingPlayer, latestMove, castling);
+                Move move1 = move.move;
+                Integer[] nextGrid = game.copyGridWithMove(currentGrid, move1, maximizingPlayer, latestMove, castling);
 
                 // Recursively call minimax for the opponent
-                MoveScore evalResult = minimax(nextGrid, alpha, beta, maxDepth - 1, false, Arrays.copyOf(castling, castling.length), move);
+                MoveScore evalResult = minimax(nextGrid, alpha, beta, maxDepth - 1, false, Arrays.copyOf(castling, castling.length), move1);
 
                 // Update the best move if this move has a higher score
                 if (evalResult.score > maxEval) {
                     maxEval = evalResult.score;
-                    bestMove = move;
+                    bestMove = move1;
                 }
 
                 // Update alpha and prune if possible
@@ -181,17 +203,18 @@ public class MiniMaxAlgorithm {
         } else {
             double minEval = Double.POSITIVE_INFINITY;
 
-            for (Move move : possibleMoves) {
+            for (PieceMovePair move : prioritizedMoves) {
                 // Apply the move to create the next grid state
-                Integer[] nextGrid = game.copyGridWithMove(currentGrid, move, maximizingPlayer, latestMove, castling);
+                Move move1 = move.move;
+                Integer[] nextGrid = game.copyGridWithMove(currentGrid, move1, maximizingPlayer, latestMove, castling);
 
                 // Recursively call minimax for the opponent
-                MoveScore evalResult = minimax(nextGrid, alpha, beta, maxDepth - 1, true, Arrays.copyOf(castling, castling.length), move);
+                MoveScore evalResult = minimax(nextGrid, alpha, beta, maxDepth - 1, true, Arrays.copyOf(castling, castling.length), move1);
 
                 // Update the best move if this move has a lower score
                 if (evalResult.score < minEval) {
                     minEval = evalResult.score;
-                    bestMove = move;
+                    bestMove = move1;
                 }
 
                 // Update beta and prune if possible

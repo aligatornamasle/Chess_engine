@@ -3,9 +3,9 @@ class PieceMovePair {
     int target;
     Move move;
     double score;
-    int promotion;
+    Integer promotion;
 
-    PieceMovePair(int start,int target, Move move, double score,int promotion) {
+    PieceMovePair(int start,int target, Move move, double score,Integer promotion) {
         this.start = start;
         this.target = target;
         this.move = move;

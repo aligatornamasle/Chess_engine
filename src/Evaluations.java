@@ -8,36 +8,60 @@ public class Evaluations {
     Integer[] gridd;
     Run game;
     int moves;
+    int wP;
+    int bP;
     public Evaluations(Run game){
 
         this.game = game;
         this.moves = moves;
     }
 
-    private static double calculateDistance(int friendly, int enemy) {
+    private static double calculateDistance(int friendly,int enemy) {
+           int  friendlyCol = friendly %8;
+           int friendlyRow = friendly/8;
 
 
-    //    return Math.max(abs(friendly.column - enemy.column), abs(friendly.row - enemy.row));
-        return 0;
+        int  enemyCol = enemy %8;
+        int enemyRow = enemy/8;
+
+
+
+        return Math.max(abs(friendlyCol - enemyCol), abs(friendlyRow - enemyRow));
+
     }
 
     public double evaluateBoard(Integer[] grid, boolean maximizingPlayer,int movesPlayed) {
         double score = 0.0;
         this.gridd=grid;
+        int wPieces = 0;
+        int bPieces = 0;
+        for(int i = 0;i<64;i++){
+            if(grid[i] >0){
+                wPieces++;
+            }
+            if(grid[i]<0){
+                bPieces++;
+            }
+
+        }
+        wP = wPieces;
+        bP = bPieces;
         //var gridInfo = game.boardStats(grid);
 
 
-/*
-        if(nPieces<14){
+
+        if((bPieces+wPieces)<14){
             //System.out.println("endgame");
-            return endGame()+score;
+            return endGame(grid,maximizingPlayer)+score;
+
+
         }
 
         if(movesPlayed<15){
             return earlyGame(grid,maximizingPlayer);
         }
 
- */
+
         return midGame(grid,maximizingPlayer)+ score;
 
 
@@ -47,22 +71,25 @@ public class Evaluations {
     }
 
 
-/*
 
-    public double endGame(){
+
+    public double endGame(Integer[] grid,boolean maximizingPlayer){
         double score = 0.0;
 
 
 
 
-        HashMap<String, Double> pieceValues = new HashMap<>();
-        pieceValues.put("Pawn", 2.5);
-        pieceValues.put("Knight", 3.2);
-        pieceValues.put("Bishop", 3.3);
-        pieceValues.put("Rook", 5.0);
-        pieceValues.put("Queen", 9.0);
-        pieceValues.put("King", 0.0);
 
+        HashMap<Integer, Double> pieceValues = new HashMap<>();
+        pieceValues.put(5, 2.5);
+        pieceValues.put(3, 3.2);
+        pieceValues.put(4, 3.3);
+        pieceValues.put(6, 5.0);
+        pieceValues.put(2, 9.0);
+        pieceValues.put(1, 0.0);
+
+        int bKing=0;
+        int wKing=0;
         //var gridInfo = game.boardStats(grid1);
         //double endGameWeight = 4/gridInfo.get("pieces");
         //int nPieces = gridInfo.get("pieces");
@@ -151,81 +178,92 @@ public class Evaluations {
         };
 
 
-        ArrayList<Piece> pieces = gridInfo.get("allPieces");
-        for(int i =0;i<gridInfo.get("allPieces").size();i++) {
-            String pieceType = pieces.get(i).getClass().getSimpleName();
+        for (int i = 0; i < grid.length; i++) {
+            int piece = grid[i];
+            if (piece == PiecesInt.None1) continue; // Skip empty squares
 
-            double value = pieceValues.getOrDefault(pieceType, 0.0);
-            int col = pieces.get(i).getRow();
-            int row = pieces.get(i).getColumn();
+            int row1 = i / 8; // Calculate row (0-7)
+            int col1 = i % 8; // Calculate column (0-7)
 
+            int row = 7-row1;
+            int col = 7-col1;
+
+            double value = pieceValues.getOrDefault(Math.abs(piece), 0.0);
+
+            // Position-based score
             double positionalValue = 0.0;
-
-            if (pieceType.equals("Pawn")) {
-                if (pieces.get(i).getColor().equals("black")) {
-
-                    //positionalValue = pawnTable[col][row];
-                    //positionalValue+=((double)piece.getRow())/3;
-                    positionalValue += bpawnTable[col][row];
-                } else {
-                    //positionalValue = pawnTable[col][row];
-                    // positionalValue-=((double)piece.getRow())/3;
-                    positionalValue += wpawnTable[col][row];
-
+            if (Math.abs(piece) == PiecesInt.Pawn1) {
+                if(piece >0){
+                positionalValue = wpawnTable[row][col];
+                }else{
+                    positionalValue = bpawnTable[row][col];
                 }
-            } else if (pieceType.equals("Knight")) positionalValue += knightTable[col][row];
-            else if (pieceType.equals("Bishop")) positionalValue += bishopTable[col][row];
-            else if (pieceType.equals("Rook")){
+            } else if (Math.abs(piece) == PiecesInt.Knight1) {
+                positionalValue = knightTable[row][col];
+            } else if (Math.abs(piece) == PiecesInt.Bishop1) {
+                positionalValue = bishopTable[row][col];
+            } else if (Math.abs(piece) == PiecesInt.Rook1) {
+                positionalValue = rookTable[row][col];
+            } else if (Math.abs(piece) == PiecesInt.Queen1) {
+                positionalValue = queenTable[row][col];
+            } else if (Math.abs(piece) == PiecesInt.King1) {
 
-
-                pieces.get(i).ifChecked(gridd);
-                // double open =  ((Rook) pieces.get(i)).getPohlad();
-
-
-
-
-                //       int a = ((Rook)pieces.get(i)).getPohlad();
-                // positionalValue += rookTable[col][row];
-                // positionalValue += open;
-
-            }
-            else if (pieceType.equals("Queen")) positionalValue += queenTable[col][row];
-            else if (pieceType.equals("King")) {
-
-                double helpScore = 0.0;
-                int whitewinning = gridInfo.get("wPieces").size();
-                int blackwinning = gridInfo.get("bPieces").size();
-                if (whitewinning > blackwinning) {
-                    if (pieces.get(i).getColor().equals("white")) {
-
-                        helpScore = 2 - (calculateDistance(gridInfo.get("bKing").get(0), gridInfo.get("whiteKing").get(0))) / 6;
-                    } else {
-                        helpScore = -2 + (calculateDistance(gridInfo.get("wKing").get(0), gridInfo.get("wKing").get(0))) / 6;
-                    }
-
-
-                } else {
-
-                    if (pieces.get(i).getColor().equals("black")) {
-                        helpScore = 2 - (calculateDistance(gridInfo.get("bKing").get(0), gridInfo.get("wKing").get(0))) / 6;
-                    } else {
-                        helpScore = -2 + (calculateDistance(gridInfo.get("wKing").get(0), gridInfo.get("wKing").get(0))) / 6;
-                    }
-
+                if( piece>0){
+                    wKing = (row*8) + col;
+                }else{
+                    bKing = (row*8) + col;
                 }
-                positionalValue += kingTable[col][row] + helpScore;
 
+                positionalValue = kingTable[row][col];
             }
 
-            // System.out.println(positionalValue);
-            if (pieces.get(i).getColor().equals("white")) {
+            // Adjust the score based on the color of the piece
+            if (PiecesInt.getColor(piece)) { // White piece
                 score += value + positionalValue;
-            } else {
+            } else { // Black piece
                 score -= value + positionalValue;
             }
-
-
         }
+
+
+int piece = 3;
+for(int i = 0;i<2;i++) {
+
+    double helpScore = 0;
+    if (wP > bP) {
+
+        if (piece > 0) {
+            helpScore = 2 - (calculateDistance(bKing,wKing)) / 7;
+            score += helpScore;
+            piece = -3;
+        } else {
+
+            helpScore = 2 - (calculateDistance(wKing,bKing)) / 7;
+            score += helpScore;
+            piece = -3;
+        }
+
+    } else {
+        if (piece > 0) {
+            helpScore = 2 +(calculateDistance(bKing,wKing)) / 7;
+            score += helpScore;
+            piece = -3;
+
+        } else {
+            helpScore = -2 + (calculateDistance(wKing,bKing)) / 7;
+            score += helpScore;
+            piece = -3;
+        }
+
+
+    }
+
+
+}
+
+
+
+
 
 
         return score;
@@ -235,7 +273,6 @@ public class Evaluations {
 
 
 
- */
 
 
 
@@ -337,8 +374,10 @@ public class Evaluations {
             int piece = grid[i];
             if (piece == PiecesInt.None1) continue; // Skip empty squares
 
-            int row = i / 8; // Calculate row (0-7)
-            int col = i % 8; // Calculate column (0-7)
+            int row1 = i / 8; // Calculate row (0-7)
+            int col1 = i % 8; // Calculate column (0-7)
+            int row = 7-row1;
+            int col = 7-col1;
 
             double value = pieceValues.getOrDefault(Math.abs(piece), 0.0);
 
@@ -374,20 +413,20 @@ public class Evaluations {
 
 
 
-    /*
 
-    public double earlyGame(Piece[][] grid,boolean maximizingPlayer){
+
+    public double earlyGame(Integer[] grid,boolean maximizingPlayer){
         double score = 0;
 
 
         // Define piece values
-        HashMap<String, Double> pieceValues = new HashMap<>();
-        pieceValues.put("Pawn", 1.0);
-        pieceValues.put("Knight", 3.0);
-        pieceValues.put("Bishop", 3.0);
-        pieceValues.put("Rook", 5.0);
-        pieceValues.put("Queen", 9.0);
-        pieceValues.put("King", 0.0);
+        HashMap<Integer, Double> pieceValues = new HashMap<>();
+        pieceValues.put(5, 1.0);
+        pieceValues.put(3, 3.2);
+        pieceValues.put(4, 3.3);
+        pieceValues.put(6, 5.0);
+        pieceValues.put(2, 9.0);
+        pieceValues.put(1, 0.0);
 
         double[][] pawnTable = {
                 {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0},
@@ -427,14 +466,14 @@ public class Evaluations {
 
 
         double[][] rookTable = {
-                {0,  0, 0, 0.5, 0., 0.5, 0, 0},
+                {-0.2,  0, 0, 0.5, 0., 0.5, 0, -0.2},
                 {-0.8, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.05},
                 {-0.8, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.05},
                 {-0.05, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.05},
                 {-0.05, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.05},
                 {-0.05, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.05},
                 {-0.05, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -0.05},
-                {0,  0, 0, 0.5, 0., 0.5, 0, 0},
+                {-0.2,  0, 0, 0.5, 0., 0.5, 0, -0.2},
         };
 
 
@@ -466,55 +505,45 @@ public class Evaluations {
 
 
 
-        // Iterate through the board and calculate score
-        // for (int row = 0; row < grid.length; row++) {
-        //   for (int col = 0; col < grid[row].length; col++) {
-        for(int i =0;i<gridInfo.get("allPieces").size();i++){
-            Piece piece = gridInfo.get("allPieces").get(i);
 
+        for (int i = 0; i < grid.length; i++) {
+            int piece = grid[i];
+            if (piece == PiecesInt.None1) continue; // Skip empty squares
 
-            int row = piece.getColumn();
-            int col = piece.getRow();
-            if (piece != null) {
-                String pieceType = piece.getClass().getSimpleName();
-                double value = pieceValues.getOrDefault(pieceType,0.0);
+            int row1 = i / 8; // Calculate row (0-7)
+            int col1 = i % 8; // Calculate column (0-7)
+            int row = 7-row1;
+            int col = 7-col1;
 
-                // Position-based score
-                double positionalValue = 0;
-                if (pieceType.equals("Pawn")) positionalValue = pawnTable[col][row];
-                else if (pieceType.equals("Knight")) positionalValue = knightTable[col][row];
-                else if (pieceType.equals("Bishop")) positionalValue = bishopTable[col][row];
-                else if (pieceType.equals("Rook")) {
+            double value = pieceValues.getOrDefault(Math.abs(piece), 0.0);
 
-
-                    piece.ifChecked(gridd);
-                    double open =  ((Rook) piece).getPohlad();
-
-
-                    positionalValue = rookTable[col][row];
-                    positionalValue += open/20;
-
-
-
-
-                }
-                else if (pieceType.equals("Queen")) positionalValue = queenTable[col][row];
-                else if (pieceType.equals("King")) positionalValue = kingTable[col][row];
-
-                if (piece.getColor().equals("white")) {
-                    score += value + positionalValue;
-                } else {
-                    score -= value + positionalValue;
-                }
+            // Position-based score
+            double positionalValue = 0.0;
+            if (Math.abs(piece) == PiecesInt.Pawn1) {
+                positionalValue = pawnTable[row][col];
+            } else if (Math.abs(piece) == PiecesInt.Knight1) {
+                positionalValue = knightTable[row][col];
+            } else if (Math.abs(piece) == PiecesInt.Bishop1) {
+                positionalValue = bishopTable[row][col];
+            } else if (Math.abs(piece) == PiecesInt.Rook1) {
+                positionalValue = rookTable[row][col];
+            } else if (Math.abs(piece) == PiecesInt.Queen1) {
+                positionalValue = queenTable[row][col];
+            } else if (Math.abs(piece) == PiecesInt.King1) {
+                positionalValue = kingTable[row][col];
             }
-            //   }
+
+            // Adjust the score based on the color of the piece
+            if (PiecesInt.getColor(piece)) { // White piece
+                score += value + positionalValue;
+            } else { // Black piece
+                score -= value + positionalValue;
+            }
         }
-
-
 
         // Add penalties for lack of king safety and rewards for central control here (not shown)
         return score;
     }
-*/
+
 
 }

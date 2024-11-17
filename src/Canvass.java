@@ -45,10 +45,10 @@ public static class ChessBoard extends JPanel implements MouseListener, MouseMot
         this.grid = grid;
         run = new Run();
 
-
-        //run.setupBoardFromFEN("8/8/3k4/8/8/8/3K4/8 w - - 0 1");
-       // run.setupBoardFromFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-run.setupBoardFromFEN("4k3/6p1/8/8/8/PP6/KPp3N1/NP6 w HAha - 0 1");
+//run.setupBoardFromFEN("8/8/8/8/2k5/3q4/8/K7 w - - 0 1");
+       // run.setupBoardFromFEN("r3k2r/3p4/8/8/8/8/7P/R3K2R w KQkq - 0 1");
+        run.setupBoardFromFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+//run.setupBoardFromFEN("4k3/6p1/8/8/8/PP6/KPp3N1/NP6 w HAha - 0 1");
         setPreferredSize(new Dimension(size,size));
         addMouseListener(this);
         addMouseMotionListener(this);
@@ -200,8 +200,11 @@ run.setupBoardFromFEN("4k3/6p1/8/8/8/PP6/KPp3N1/NP6 w HAha - 0 1");
     }
 
     public void mouseClicked(MouseEvent e) {
-        boolean gameFlow = true;
-        if (gameFlow) { // Assuming gameFlow represents if the game is ongoing
+       // boolean gameFlow = true;
+        if(!run.gameflow){
+            System.out.println("CHECKMATE");
+        }
+        if (run.gameflow) { // Assuming gameFlow represents if the game is ongoing
             point = e.getPoint();
             int sizeRect = size / 8;
             row = 7 - (point.y / sizeRect); // Flip the board's perspective

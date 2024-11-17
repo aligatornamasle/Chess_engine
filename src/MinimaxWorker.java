@@ -34,12 +34,12 @@ class MinimaxWorker extends SwingWorker<Move, Void> {
         Move mv;
 
             if(a<5){
-                minimax.createTree(ggrid, 6, false,movesPlayed, Arrays.copyOf(isCastling,isCastling.length),previousMove,gameGrid);
+                minimax.createTree(ggrid, 7, false,movesPlayed, Arrays.copyOf(isCastling,isCastling.length),previousMove,gameGrid);
 
             }else
 
             if(a< 12){
-                minimax.createTree(ggrid, 5, false,movesPlayed, Arrays.copyOf(isCastling,isCastling.length),previousMove,gameGrid);
+                minimax.createTree(ggrid, 6, false,movesPlayed, Arrays.copyOf(isCastling,isCastling.length),previousMove,gameGrid);
 
 
             } else{

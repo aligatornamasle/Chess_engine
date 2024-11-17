@@ -173,9 +173,38 @@ int[][] numToEndge = new int[64][];
     }
 
 
+    public boolean isChecked(Integer[] grid,boolean color, Move enpasant){
+        boolean ischecked= false;
+
+
+
+        Integer[] gridCopy = new Integer[64];
+
+        for(int i = 0;i<64;i++){
+            gridCopy[i]= grid[i];
+        }
+
+        var moves = generateMoves1(!color,gridCopy,enpasant,false);
+        int king = color?PiecesInt.King1:PiecesInt.King2;
+        for(Move mv: moves){
+            if(gridCopy[mv.target] == king)
+                ischecked = true;
+        }
+
+
+
+        return ischecked;
+    }
+
+
+
+
+
 
     public boolean isValidMove(Integer[] grid, int move,int piece,int start,boolean color,Move enpasant){
         Integer[] gridCopy = new Integer[64];
+
+
 
         for(int i = 0;i<64;i++){
             gridCopy[i]= grid[i];
