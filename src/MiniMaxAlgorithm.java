@@ -80,7 +80,7 @@ public class MiniMaxAlgorithm {
         }
         // Base case: if we reach the maximum depth, evaluate the board
         if (maxDepth == 0) {
-           // endNodes++;
+            // endNodes++;
             //leafNodes++;
             return quiescence(
                     currentGrid,
@@ -123,13 +123,13 @@ public class MiniMaxAlgorithm {
                 }
             }
 
-           // Move mv = new Move(move.start, move.target, move.piece, move.promotion);
+            // Move mv = new Move(move.start, move.target, move.piece, move.promotion);
             Move mv = new Move(move.start, move.target, move.piece, move.promotion,move.captureScore_);
             Integer[] nextGrid = search.copyGridWithMove(Arrays.copyOf(currentGrid, currentGrid.length), mv, maximizingPlayer, latestMove, Arrays.copyOf(castling, castling.length));
 
-                // Evaluate the move if it's not in the transposition table
-                double moveScore = chessBoardEvaluator.evaluateBoard(nextGrid,null);
-                prioritizedMoves.add(new MoveScore(moveScore,move));
+            // Evaluate the move if it's not in the transposition table
+            double moveScore = chessBoardEvaluator.evaluateBoard(nextGrid,null);
+            prioritizedMoves.add(new MoveScore(moveScore,move));
 
         }
 
@@ -147,7 +147,7 @@ public class MiniMaxAlgorithm {
         // Iterate through prioritized moves
         for (MoveScore move : prioritizedMoves) {
 
-           // Integer[] nextGrid = game.copyGridWithMove(currentGrid, move1, maximizingPlayer, latestMove, castling);
+            // Integer[] nextGrid = game.copyGridWithMove(currentGrid, move1, maximizingPlayer, latestMove, castling);
             Integer[] nextGrid = search.copyGridWithMove(Arrays.copyOf(currentGrid, currentGrid.length), move.move, maximizingPlayer, latestMove, Arrays.copyOf(castling, castling.length));
 
             // Recursive call to minimax
@@ -175,7 +175,7 @@ public class MiniMaxAlgorithm {
 
             // Alpha-beta pruning
             if (beta <= alpha) {
-              //  pruned++;
+                //  pruned++;
                 break;
             }
         }
@@ -185,7 +185,10 @@ public class MiniMaxAlgorithm {
 
     private MoveScore quiescence(Integer[] currentGrid, double alpha, double beta, boolean maximizingPlayer,
                                  boolean[] castling, Move latestMove, int depth) {
-        if (depth <= 0 || isInterrupted.getAsBoolean() || System.currentTimeMillis() - startTime >= maxTimeMs) {
+        if(isInterrupted.getAsBoolean() || System.currentTimeMillis() - startTime >= maxTimeMs){
+            return null;
+        }
+        if (depth <= 0) {
             double score = chessBoardEvaluator.evaluateBoard(currentGrid, latestMove);
             return new MoveScore(score, latestMove);
         }
@@ -273,7 +276,8 @@ public class MiniMaxAlgorithm {
                     depth - 1
             );
 
-            if (result == null) return null;
+            if (result == null) {
+                return null;}
             mv = result;
             // Update alpha/beta
             double score = result.score;
@@ -416,7 +420,7 @@ public class MiniMaxAlgorithm {
 
             // Alpha-beta pruning
             if (beta <= alpha) {
-              //  pruned++;
+                //  pruned++;
                 break; // Prune the remaining branches
             }
         }
@@ -432,7 +436,7 @@ public class MiniMaxAlgorithm {
             return null;
         }
         if (maxDepth == 0) {
-           // leafNodes++;
+            // leafNodes++;
             double score = chessBoardEvaluator.evaluateBoard(currentGrid, null);
             return new MoveScore(score, null);
         }
@@ -482,6 +486,7 @@ public class MiniMaxAlgorithm {
 
             // If the search was aborted due to time, return null
             if (evalResult == null) {
+
                 return null;
             }
 
@@ -502,7 +507,7 @@ public class MiniMaxAlgorithm {
 
             // Alpha-beta pruning
             if (beta <= alpha) {
-               // pruned++;
+                // pruned++;
                 break; // Prune the remaining branches
             }
         }
