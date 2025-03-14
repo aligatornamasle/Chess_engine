@@ -3,21 +3,15 @@ public class Move {
    int target;
    int piece;
    Integer promotion;
-   int promote;
+   int captureScore_;
+   boolean repetitive = false;
 
-    public Move(int start, int target,int piece,Integer promotion) {
+    public Move(int start, int target,int piece,Integer promotion,int captureScore_) {
         this.start = start;
         this.target = target;
         this.piece=piece;
         this.promotion = promotion;
+        this.captureScore_ = captureScore_;
     }
-    public int getPiece(){
-        return piece;
-    }
-    public void setPromote(int promote){
-        this.promote = promote;
-    }
-    public int getPromote(){
-        return promote;
-    }
+
 }
