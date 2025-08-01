@@ -46,7 +46,10 @@ public class FenBoardUtilities {
         // Black castling rights
         if (castlingRights.contains("k")) {
             castlingBoolean[5] = false; // Black's right rook
-            castlingBoolean[4] = false; // Black's king
+            castlingBoolean[3] = false; // Black's king
+
+
+
         }
         if (castlingRights.contains("q")) {
             castlingBoolean[3] = false; // Black's left rook

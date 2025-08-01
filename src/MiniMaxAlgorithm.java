@@ -82,6 +82,8 @@ public class MiniMaxAlgorithm {
         if (maxDepth == 0) {
             // endNodes++;
             //leafNodes++;
+
+
             return quiescence(
                     currentGrid,
                     alpha,
