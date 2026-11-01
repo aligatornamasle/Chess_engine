@@ -4,7 +4,63 @@ import java.util.Arrays;
 public class ThreeFoldRepetition {
 
 
-    public static ArrayList<Move> getMovesCausingThreefoldRepetition(Search search, ArrayList<String> positionHistory, boolean maximizingPlayer, Integer[] board, Move previosMove, boolean[] castling, boolean turn) {
+
+
+    public static ArrayList<Move> getMovesCausingThreefoldRepetition(
+            Search search,
+            ArrayList<String> positionHistory,
+            boolean maximizingPlayer,
+            Integer[] board,
+            Move previosMove,
+            boolean[] castling,
+            boolean turn
+    ) {
+        ArrayList<Move> movesToReturn = new ArrayList<>();
+        var moves = search.getPossibleMoves(maximizingPlayer, board, previosMove, castling);
+        for(Move move: moves) {
+            Integer[] boardWithMove = search.copyGridWithMove(Arrays.copyOf(board,board.length),move,maximizingPlayer,previosMove,Arrays.copyOf(castling,castling.length));
+            String position = FenBoardUtilities.getBoardPosition(boardWithMove,turn,castling);
+            int counter = 0;
+            for (String s : positionHistory) {
+                if (s.equals(position)) {
+                    counter++;
+                }
+            }
+            if(counter >= 2){
+                movesToReturn.add(move);
+            }else{
+
+                var moves1 = search.getPossibleMoves(!maximizingPlayer, boardWithMove, move, castling);
+                for(Move move1: moves1) {
+                    Integer[] boardWithMove2 = search.copyGridWithMove(Arrays.copyOf(boardWithMove,boardWithMove.length),move1,!maximizingPlayer,previosMove,Arrays.copyOf(castling,castling.length));
+                    String position1 = FenBoardUtilities.getBoardPosition(boardWithMove2,!turn,castling);
+                    counter = 0;
+                    for (String s : positionHistory) {
+                        if (s.equals(position1)) {
+                            counter++;
+                        }
+                    }
+                    if(counter >= 2){
+                        movesToReturn.add(move);
+                    }
+
+
+                }
+
+
+
+
+
+            }
+        }
+
+
+        return movesToReturn;
+
+    }
+
+
+    public static ArrayList<Move> getMovesCausingThreefoldRepetition1(Search search, ArrayList<String> positionHistory, boolean maximizingPlayer, Integer[] board, Move previosMove, boolean[] castling, boolean turn) {
         ArrayList<Move> movesToReturn = new ArrayList<>();
         var moves = search.getPossibleMoves(maximizingPlayer, board, previosMove, castling);
         for(Move move: moves) {

@@ -46,4 +46,13 @@ public class TestingDepths {
         assertEquals( 164_075_551,search.counterNodes);
     }
 
+
+    @Test
+    void position7(){
+        Search search = new Search();
+        search.setFenCheckDepth("r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1",6,true);
+        assertEquals( 706_045_033,search.counterNodes);
+    }
+
+
 }

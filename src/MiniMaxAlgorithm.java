@@ -75,7 +75,7 @@ public class MiniMaxAlgorithm {
         if (isInterrupted.getAsBoolean()||System.currentTimeMillis() - startTime >= maxTimeMs) {
             return null;
         }
-        if(latestMove !=null &&latestMove.repetitive){
+        if(latestMove !=null && latestMove.repetitive){
             return new MoveScore(0, latestMove);
         }
         // Base case: if we reach the maximum depth, evaluate the board
@@ -302,7 +302,8 @@ public class MiniMaxAlgorithm {
             }
         }
 
-        return new MoveScore(mv.score, latestMove);
+        //return new MoveScore(mv.score, latestMove);
+        return new MoveScore(maximizingPlayer ? alpha : beta, latestMove);
     }
 
 

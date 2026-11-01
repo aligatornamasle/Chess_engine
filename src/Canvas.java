@@ -13,6 +13,7 @@ public class Canvas extends JFrame {
     private final JTextField timeField;
     private final JButton colorButton;
     private boolean randomNoise1 = false;
+    private boolean selfPlay = false;
     private boolean playerColor = true;
 
     public Canvas() {
@@ -27,7 +28,7 @@ public class Canvas extends JFrame {
 
         // Create the chessboard
         chessBoard = new ChessBoard(size);
-        chessBoard.setupGame("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", 3, 1000, false);
+        chessBoard.setupGame("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", 3, 1000, false,false);
 
         // Create the input panel
         JPanel inputPanel = new JPanel(new GridBagLayout());
@@ -151,7 +152,7 @@ public class Canvas extends JFrame {
                 chessBoard.toggleBoardOrientation();
             }
             chessBoard.newSearch();
-            chessBoard.setupGame(fen, depth, time, randomNoise1);
+            chessBoard.setupGame(fen, depth, time, randomNoise1,selfPlay);
             chessBoard.repaint();
         });
         inputPanel.add(startButton, gbc);
@@ -166,6 +167,18 @@ public class Canvas extends JFrame {
         gbc.gridy = 8;
         JButton helpButton = getJButton(mediumCyanGray);
         inputPanel.add(helpButton, gbc);
+        gbc.gridx=1;
+        JCheckBox checkbox1 = new JCheckBox("Self Play");
+
+        checkbox1.addItemListener(e -> {
+            try {
+                SoundPlayer.sound("src/sounds/click.wav");
+            } catch (UnsupportedAudioFileException | IOException | LineUnavailableException ex) {
+                throw new RuntimeException(ex);
+            }
+            selfPlay = e.getStateChange() == ItemEvent.SELECTED;
+        });
+        inputPanel.add(checkbox1, gbc);
         // Add components
         add(chessBoard, BorderLayout.CENTER);
         add(rightPanel, BorderLayout.EAST);

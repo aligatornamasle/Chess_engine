@@ -2,7 +2,7 @@ import java.util.HashMap;
 
 public class ChessHeuristics {
 
-
+    public static int counterr =0;
     public static boolean randomNoise = false;
     public static int[] knightTable = {
             -50,-40,-30,-30,-30,-30,-40,-50,

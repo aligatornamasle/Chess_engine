@@ -22,6 +22,9 @@ public  class ChessBoard extends JPanel implements MouseListener, MouseMotionLis
     private final MiniMaxAlgorithm minimax;
     private int depth = 3;
     private int time = 1000;
+    private boolean selfplay = false;
+    private boolean first;
+    private boolean second;
 
     private MinimaxWorker currentWorker;
 
@@ -61,8 +64,9 @@ public  class ChessBoard extends JPanel implements MouseListener, MouseMotionLis
         currentWorker.execute();
     }
 
-    public void setupGame(String fen, int depth, int time, boolean randomNoise) {
+    public void setupGame(String fen, int depth, int time, boolean randomNoise,boolean selfplay) {
         positionHistory.clear();
+        this.selfplay = selfplay;
         halfMoveClock = 0;
         this.depth = Math.max(depth, 1);
         this.time = Math.max(time, 10);
@@ -122,6 +126,17 @@ public  class ChessBoard extends JPanel implements MouseListener, MouseMotionLis
         }else {
             FenBoardUtilities.setupBoardFromFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", search.board);
         }
+        if(isBoardFlipped ==true){
+            first = false;
+            second = true;
+        }else{
+            first = true;
+            second = false;
+        }
+
+        if (selfplay) {
+            startSelfPlay();
+        }
     }
 
     public void workerInitStarting(){
@@ -173,6 +188,7 @@ public  class ChessBoard extends JPanel implements MouseListener, MouseMotionLis
 
 
 // Check if there are any legal moves left (checkmate condition)
+
         if(turn && isBoardFlipped){
             search.makeMove(false, null);
 
@@ -190,6 +206,8 @@ public  class ChessBoard extends JPanel implements MouseListener, MouseMotionLis
 
         }
 
+
+
         boolean whiteHasMoves = search.gameFlow;
         boolean blackHasMoves = search.gameFlow;
         if(Draw.isDraw(turn, halfMoveClock,search,isBoardFlipped,positionHistory)){
@@ -199,6 +217,8 @@ public  class ChessBoard extends JPanel implements MouseListener, MouseMotionLis
             blackHasMoves = false;
             search.gameFlow = false;
         }
+
+
 
         boolean whiteCheckmate = isWhiteChecked && !whiteHasMoves;
         boolean blackCheckmate = isBlackChecked && !blackHasMoves;
@@ -320,6 +340,7 @@ public  class ChessBoard extends JPanel implements MouseListener, MouseMotionLis
 
     public void mouseDragged(MouseEvent e) {}
     public void mouseClicked(MouseEvent e) {
+
         if (!search.gameFlow) {
             return; // Exit if the game is not in progress
         }
@@ -387,6 +408,9 @@ public  class ChessBoard extends JPanel implements MouseListener, MouseMotionLis
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+
+
+
     }
 
     @Override
@@ -403,4 +427,74 @@ public  class ChessBoard extends JPanel implements MouseListener, MouseMotionLis
 
     @Override
     public void mouseMoved(MouseEvent e) {}
+
+
+
+    public void startSelfPlay() {
+        runTurn();
+    }
+
+    private void runTurn() {
+        if (!search.gameFlow) {
+            // Game is over, stop running workers
+            return;
+        }
+
+        // First worker (true)
+        if(isBoardFlipped){
+            turn = false;
+        }else{
+turn = true;}
+        if(search.previosMove != null)
+        search.previosMove.repetitive = false;
+
+        MinimaxWorker firstWorker = new MinimaxWorker(
+                search, this.minimax, this,
+                search.isCastling, search.previosMove, repeatingMoves,
+                depth, time, true
+        );
+
+
+
+        firstWorker.addPropertyChangeListener(evt -> {
+
+            if (evt.getNewValue() == SwingWorker.StateValue.DONE) {
+                if (!search.gameFlow) {
+                    return; // stop if game over after first worker
+                }
+
+                // Second worker (false)
+
+                if(isBoardFlipped){
+                    turn = true;
+                }else{
+                    turn = false;}
+                if(search.previosMove != null)
+                search.previosMove.repetitive = false;
+
+                MinimaxWorker secondWorker = new MinimaxWorker(
+
+                        search, this.minimax, this,
+                        search.isCastling, search.previosMove, repeatingMoves,
+                        depth, time, false
+                );
+
+
+                secondWorker.addPropertyChangeListener(evt2 -> {
+
+                    if (evt2.getNewValue() == SwingWorker.StateValue.DONE) {
+                        // After second worker finishes, run the next turn recursively
+                        runTurn();
+                    }
+                });
+
+
+                secondWorker.execute();
+            }
+        });
+
+
+        firstWorker.execute();
+    }
+
 }

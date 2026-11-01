@@ -9,6 +9,11 @@ public class Draw {
         int blackPieces = 0;
         boolean whiteHasPawnOrMajorPiece = false;
         boolean blackHasPawnOrMajorPiece = false;
+        boolean whiteHasBishop = false;
+        boolean blackHasBishop = false;
+        boolean blackHasKnight= false;
+        boolean whiteHasKnight= false;
+
 
         for (int piece : board) {
             if (piece > 0) {
@@ -21,6 +26,18 @@ public class Draw {
                 if (piece == -PiecesInt.Pawn1 || piece == -PiecesInt.Queen1 || piece == -PiecesInt.Rook1) {
                     blackHasPawnOrMajorPiece = true;
                 }
+            }
+            if(piece == PiecesInt.Bishop2){
+                blackHasBishop = true;
+            }
+            if(piece == PiecesInt.Bishop1){
+                whiteHasBishop = true;
+            }
+            if(piece == PiecesInt.Knight2){
+                blackHasKnight = true;
+            }
+            if(piece == PiecesInt.Knight1){
+                whiteHasKnight = true;
             }
         }
 
@@ -42,6 +59,14 @@ public class Draw {
                 }
             }
         }
+        if (whitePieces == 2 && blackPieces == 2 && whiteHasBishop  && blackHasBishop) {
+                return true; // Same-colored bishops
+
+        }
+        if (whitePieces == 2 && blackPieces == 2 && whiteHasKnight  && blackHasKnight) {
+            return true; // Same-colored bishops
+
+        }
         return false;
     }
 
@@ -51,6 +76,7 @@ public class Draw {
 
     public static boolean isFiftyMoveRule(int movesSinceLastPawnMoveOrCapture) {
         return movesSinceLastPawnMoveOrCapture >= 100;
+        //return false;
     }
 
     public static boolean isStalemate(boolean turn,Search search,boolean isBoardFlipped) {
